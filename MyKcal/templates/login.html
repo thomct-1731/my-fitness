@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MyKcal | Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"0>
+
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+
+      .user-card {
+        width: 40%;
+        margin-top: auto;
+        margin-bottom: auto;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        border-radius: 5px;
+        background-color: #f6f8fa;
+      }
+
+      #messages{
+        background-color: rgb(223, 108, 88);
+        color: white;
+        padding: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container h-100">
+      <div class="d-flex justify-content-center h-100">
+        <div class="user-card py-3">
+          <div class="d-flex justify-content-center">
+            <h3 id="form-title">LOGIN</h3>
+          </div>
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-info mx-4" role="alert">
+                <strong>{{ message }}</strong>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <div class="justify-content-center mx-4 my-1">
+            <form method="POST" action="">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="exampleInputUsername">Username</label>
+                <input placeholder="Username" type="text" name="username" class="form-control" id="exampleInputUsername">
+              </div>
+              <div class="form-group">
+                <label for="exampleInputPassword1">Password</label>
+                <input placeholder="Password" type="password" name="password" class="form-control" id="exampleInputPassword1">
+              </div>
+              <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success">Submit</button>
+              </div>
+            </form>
+          </div>
+          <div class="mt-4">
+            <div class="d-flex justify-content-center links">
+              Don't have an account? <a href="{% url 'register' %}" class="ml-2">Sign Up</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

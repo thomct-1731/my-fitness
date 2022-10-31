@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyKcal | TDEE</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"0>
+
+    <style>
+      body {
+        background-color: #FAFAFA;
+      }
+
+      .summary-input {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        color: #31708f;
+        background-color: #d9edf7;
+        border-color: #bce8f1;
+        font-size: 14px;
+      }
+
+      .btn-xs {
+        padding: 1px 5px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
+        color: #fff;
+        background-color: #337ab7;
+        border-color: #2e6da4;
+      }
+
+      .maintenance-calories {
+        background: #fdf6e5;
+        color: #333;
+        position: relative;
+        border-radius: 20px;
+        text-align: center;
+        border: 1px solid #ede7bb;
+      }
+
+      .cals {
+        font-size: 13px;
+        font-style: italic;
+      }
+
+      .tdee-table, .bmi-table {
+        font-size: 14px;
+      }
+
+      .hightlight {
+        font-weight: 600;
+        font-size: 105%;
+        letter-spacing: 0.3px;
+      }
+
+      .macronutrients {
+        font-size: 14px;
+      }
+
+      .tab-content .label {
+          border-bottom-left-radius: 0px;
+          border-bottom-right-radius: 0px;
+          padding: 0.2em 0.6em 0.4em;
+      }
+
+      .label-primary {
+          background-color: #337ab7;
+      }
+
+      .label {
+          font-size: 75%;
+          font-weight: 700;
+          line-height: 1;
+          color: #fff;
+          text-align: center;
+          white-space: nowrap;
+          vertical-align: baseline;
+          border-radius: 0.25em;
+      }
+
+      .macrobox {
+        background: #fdf6e5;
+        width: 96%;
+        color: #333;
+        position: relative;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        border-top-right-radius: 10px;
+        text-align: center;
+        border: 1px solid #ede7bb;
+        padding-left: 0;
+        padding-right: 0;
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+
+      .explain {
+        color: #777;
+        font-style: italic;
+      }
+    </style>
+
+  </head>
+
+  <body>
+    {% include 'nav.html' %}
+    <div class="container">
+      {% block content %}
+        <div class="tdee-caculator my-4">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert">x</button>
+                <strong>{{ message }}</strong>
+              </div>
+            {% endfor %}
+          {% endif %}
+          <h3>YOUR STATS</h3>
+          <div class="summary-input my-3">
+            You are a <span class="hightlight">{{ profile.age }}</span> year old <span class="hightlight">{{ profile.gender }}</span> who is <span class="hightlight">{{ profile.height }}</span> cm tall and weighs <span class="hightlight">{{ profile.weight }}</span> kg while doing <span class="hightlight">{{ profile.activity.name }}</span>.
+            <a class="btn btn-primary btn-xs ml-3" href="{% url 'updateProfile' id=profile.pk %}">Re-Calculate</a>
+          </div>
+          <div class="row gx-4 mb-3">
+            <div class="col-4">
+              <p class="mb-3 font-weight-bold text-center">Your Maintenance Calories</p>
+              <div class="h-75 maintenance-calories">
+                <div class="pt-5">
+                  <h2>{{ calories.day }}</h2>
+                  <span class="cals">calories per day</span>
+                </div>
+                <hr>
+                <div class="">
+                  <h2>{{ calories.week }}</h2>
+                  <span class="cals">calories per week</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-8 tdee-table">
+              <p class="mb-3 font-weight-bold text-center">Based on the Mifflin-St Jeor Formula</p>
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <td>Basal Metabolic Rate</td>
+                    <td>{{ bmr }} calories per day</td>
+                  </tr>
+                  {% for activity in activities %}
+                    <tr {% if activity.id == profile.activity_id %}class="hightlight"{% endif %}>
+                      <td>{{activity.name}} </td>
+                      <td>{{activity.calories}} calories per day</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row gx-4">
+            <div class="col-4 ideal-weigh">
+              <p class="mb-3 font-weight-bold text-center">Ideal Weight</p>
+              <div class="h-50 text-center maintenance-calories py-4">
+                <h4>{{weight.min}} - {{weight.max}} </h4>
+                <span class="cals">kg</span>
+              </div>
+            </div>
+            <div class="col-8 bmi-table">
+              <p class="mb-3 font-weight-bold text-center">BMI Score: {{bmi}}</p>
+              <table class="table">
+                <tbody>
+                  {% for sco in bmi_scores %}
+                    <tr {% if sco.valid %}class="hightlight"{% endif %}>
+                      <td>{{sco.score}}</td>
+                      <td>{{sco.name}} </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="macronutrients">
+            <h4>Macronutrients</h4>
+            <ul class="nav nav-tabs mb-3" id="macro-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="#maintenance" aria-controls="maintenance" role="tab" data-toggle="tab" aria-expanded="true">Maintenance</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#cutting" aria-controls="cutting" role="tab" data-toggle="tab" aria-expanded="false">Cutting</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#bulking" aria-controls="bulking" role="tab" data-toggle="tab" aria-expanded="false">Bulking</a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              {% for macro in macros %}
+                <div role="tabpanel" class="tab-pane {% if macro.name == 'maintenance' %}active{% endif %}" id={{macro.name}}>
+                  <p>{{macro.intro | safe}}</p>
+                  <div class="row">
+                    {% for diet in macro.data %}
+                      <div class="col-sm-4">
+                        <span class="label label-primary text-center type">{{diet.name}}</span>
+                        <div class="macrobox">
+                          <div>
+                            <h4><abbr title="calories">{{diet.protein}}g</abbr></h4>
+                            <span class="cals">protein</span>
+                          </div>
+                          <hr>
+                          <div>
+                            <h4><abbr title="calories">{{diet.fats}}g</abbr></h4>
+                            <span class="cals">fats</span>
+                          </div>
+                          <hr>
+                          <div>
+                            <h4><abbr title="calories">{{diet.carbs}}g</abbr></h4>
+                            <span class="cals">carbs</span>
+                          </div>
+                        </div>
+                        <p class="mt-1 text-center explain">
+                          <small>{{diet.explain}}</small>
+                        </p>
+                      </div>
+                    {% endfor %}
+                  </div>
+              </div>
+              {% endfor %}
+            </div>
+            <p class="mt-3 text-center">
+              <small>There are 4 calories per gram of both protein and carbohydrates, and 9 calories per gram of fats.</small>
+            </p>
+          </div>
+        </div>
+      {% endblock %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+  </body>
+</html>
